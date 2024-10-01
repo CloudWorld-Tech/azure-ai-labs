@@ -1,0 +1,65 @@
+﻿@page "/"
+@using CloudWorld.AI.Series.Web.Features.ComputerVision.ImageAnalysis
+@using MediatR
+@inject IMediator Mediator
+@rendermode InteractiveServer
+
+<PageTitle>Computer Vision</PageTitle>
+
+<h1>Image Analysis</h1>
+
+<form @onsubmit="OnSubmit" class="needs-validation" novalidate>
+    <div class="mb-3">
+        <label for="imageUrl" class="form-label">Image URL</label>
+        <input type="text" class="form-control" id="imageUrl" @bind="(_imageAnalysisRequest.ImageUrl)" required/>
+        <div class="invalid-feedback">
+            Please provide a valid image URL.
+        </div>
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+
+<div class="text-center my-3">
+    <img src="@_imageAnalysisRequest.ImageUrl" alt="image to analize" class="img-fluid rounded shadow"/>
+</div>
+
+@if (_imageAnalysisResponse != null)
+{
+    <h2>Analysis Result</h2>
+    <table>
+        <thead>
+        <tr>
+            <th>Tags</th>
+        </tr>
+        </thead>
+        <tbody>
+
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>Tag</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var tag in _imageAnalysisResponse.Tags)
+            {
+                <tr>
+                    <td>@tag</td>
+                </tr>
+            }
+            </tbody>
+        </table>
+        </tbody>
+    </table>
+}
+
+@code
+{
+    readonly private ImageAnalysisRequest _imageAnalysisRequest = new();
+    private ImageAnalysisResponse? _imageAnalysisResponse;
+
+    async private Task OnSubmit()
+    {
+        _imageAnalysisResponse = await Mediator.Send(new ImageAnalysisCommand(_imageAnalysisRequest));
+    }
+}
