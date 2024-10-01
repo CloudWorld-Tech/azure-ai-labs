@@ -11,7 +11,7 @@
 <form @onsubmit="OnSubmit" class="needs-validation" novalidate>
     <div class="mb-3">
         <label for="imageUrl" class="form-label">Image URL</label>
-        <input type="text" class="form-control" id="imageUrl" @bind="(_imageAnalysisRequest.ImageUrl)" required/>
+        <input type="text" class="form-control" id="imageUrl" @bind="_imageAnalysisRequest.ImageUrl" required/>
         <div class="invalid-feedback">
             Please provide a valid image URL.
         </div>
