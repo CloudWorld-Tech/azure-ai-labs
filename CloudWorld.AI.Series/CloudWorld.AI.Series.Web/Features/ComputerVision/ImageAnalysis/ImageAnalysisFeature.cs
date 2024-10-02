@@ -11,7 +11,11 @@ public class ImageAnalysisRequest
     public string? ImageUrl { get; set; }
 }
 
-public record ImageAnalysisResponse(List<string> Tags);
+public record ImageAnalysisResponse(List<ImageAnalysisResponseTag> Tags, List<ImageAnalysisResponseCaption> Captions);
+
+public record ImageAnalysisResponseTag(string Name, float Confidence);
+
+public record ImageAnalysisResponseCaption(string Text, float Confidence);
 
 public class ImageAnalysisHandler(IAzureClientFactory<ImageAnalysisClient> imageAnalysisClientFactory)
     : IRequestHandler<ImageAnalysisCommand, ImageAnalysisResponse>
@@ -37,15 +41,25 @@ public class ImageAnalysisHandler(IAzureClientFactory<ImageAnalysisClient> image
             SmartCropsAspectRatios = [0.9F, 1.33F]
         };
 
-        var result = await client.AnalyzeAsync(
+        var response = await client.AnalyzeAsync(
             imageUri,
             visualFeatures,
             options, cancellationToken);
 
-        var tags = new List<string>();
+        var result = response.Value;
+        var tags = new List<ImageAnalysisResponseTag>();
 
-        result.Value.Objects.Values.ToList().ForEach(obj => { tags.AddRange(obj.Tags.Select(x => x.Name)); });
+        result.Tags.Values.ToList()
+            .ForEach(obj => { tags.Add(new ImageAnalysisResponseTag(obj.Name, obj.Confidence)); });
 
-        return new ImageAnalysisResponse(tags);
+        var captions = new List<ImageAnalysisResponseCaption>
+        {
+            new(result.Caption.Text, result.Caption.Confidence)
+        };
+
+        result.DenseCaptions.Values.ToList()
+            .ForEach(obj => { captions.Add(new ImageAnalysisResponseCaption(obj.Text, obj.Confidence)); });
+        
+        return new ImageAnalysisResponse(tags, captions);
     }
 }
