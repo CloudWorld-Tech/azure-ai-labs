@@ -59,7 +59,7 @@ public class ImageAnalysisHandler(IAzureClientFactory<ImageAnalysisClient> image
 
         result.DenseCaptions.Values.ToList()
             .ForEach(obj => { captions.Add(new ImageAnalysisResponseCaption(obj.Text, obj.Confidence)); });
-        
+
         return new ImageAnalysisResponse(tags, captions);
     }
 }
