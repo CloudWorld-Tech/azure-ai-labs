@@ -1,0 +1,6 @@
+@CloudWorld.AI.Series.Search_HostAddress = http://localhost:5163
+
+GET {{CloudWorld.AI.Series.Search_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
